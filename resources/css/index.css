@@ -38,7 +38,7 @@
 }
 
 :root {
-  color: white;
+  color: #e8a236;
   font-family: Inter;
   font-weight: 400;
   line-height: 60px;
@@ -50,7 +50,7 @@
 
 /* Общие стили */
 body {
-  background: linear-gradient(156.2deg, #000022 18.39%, #5d13f9 84.11%);
+  background: linear-gradient(200deg, #363636 18.39%, #212121 84.11%);
   background-repeat: no-repeat;
   min-height: 100vh;
   margin: 0;
@@ -70,7 +70,7 @@ body {
 }
 /* Стили для логотипа (brand-name) */
 .brand-name {
-  color: white;
+  color: #e8a236; /* изменен цвет текста */
   font: normal 2.5rem/2.125rem var(--euclidflex-medium);
   margin: 0;
 }
@@ -78,44 +78,9 @@ body {
   margin: 0;
   vertical-align: middle;
 }
-
-/* Стили для контейнера about-container */
-.about-container {
-  background-color: transparent;
-  padding: 20px;
-  text-align: center;
-  margin-left: 10%;
-  margin-right: 10%;
-}
-
-/* Стили для заголовка page-title */
-.page-title {
-  background-image: linear-gradient(
-    250deg,
-    #02feff 10%,
-    #fff 60%
-  ); /* Градиентный фон для текста */
-  -webkit-background-clip: text;
-  color: transparent;
-  font: normal 3.5rem/3.125rem var(--euclidflex-medium);
-}
-
-/* Стили для текста */
-.about-information {
-  font: normal 2.5rem/2.525rem var(--euclidflex-medium);
-  background-image: linear-gradient(
-    250deg,
-    #02feff 10%,
-    #fff 60%
-  ); /* Градиентный фон для текста */
-  -webkit-background-clip: text;
-  color: transparent;
-  margin-top: 10px;
-}
-
 /* Стили для контейнера .input-group */
 .input-group {
-  color: #02feff;
+  color: #150b0b;
   display: flex;
   align-items: center;
   flex: 1;
@@ -132,41 +97,42 @@ body {
   border-radius: 0;
   border-right: 0;
   background-color: transparent;
-  color: white;
+  color: #150b0b; /* изменен цвет текста */
   font-size: 20px;
-  border: 1px solid #02feff;
+  border: 1px solid #212121;
   transition: background-color 0.3s ease;
 }
 
 .input-group input:focus {
   background-color: transparent;
-  color: white;
+  color: #e8a236; /* изменен цвет текста */
 }
 /* Стили для плейсхолдера */
 .input-group input::placeholder {
-  color: rgb(149, 199, 255);
+  color: rgb(109, 100, 45);
 }
 /* Стили для контейнера с карточками багажа */
 .container .row {
-  border: 2px solid #5d13f9;
+  border: 2px solid #150b0b;
   padding: 20px;
   border-radius: 10px;
 }
 
 .cards-title {
-  font: normal 2rem/2.125rem var(--euclidflex-regular);
-  color: #fff;
+  font: normal 1.7rem/1.825rem var(--euclidflex-regular);
+  color: #e8a236; /* изменен цвет текста */
+  padding-top: 2%;
   margin-bottom: 0;
 }
 /* Стили для карточек багажей */
 .cards {
   background: none;
-  color: #fff;
-  border: none;
+  color: #e8a236; /* изменен цвет текста */
+  border: #150b0b;
   border-radius: 5px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
   width: 300px;
-  height: 350px;
+  height: 400px;
   margin-bottom: 20px;
   display: flex;
   text-align: center;
@@ -176,7 +142,6 @@ body {
 .cards-img-top {
   max-width: 100%;
   max-height: 100%;
-  height: auto;
 }
 
 .btn {
@@ -184,31 +149,32 @@ body {
   height: 60px;
   cursor: pointer;
   background: transparent;
-  border: 1px solid #91c9ff;
+  border: 1px solid #150b0b;
   outline: none;
   transition: 0.5s ease-in-out;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: white;
+  color: #e8a236; /* изменен цвет текста */
   font-family: "EuclidFlex Bold", sans-serif;
   font-size: 18px;
 }
 
 .btn:hover {
   transition: 0.5s ease-in-out;
-  background: #4f95da;
+  background: #150b0b;
+  border: 1px solid #150b0b;
 }
 
 .card {
   background: none;
-  color: #fff;
+  color: #e8a236; /* изменен цвет текста */
   border: none;
   border-radius: 5px;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-  width: 350px;
-  height: 650px;
+  width: 550px;
+  height: 850px;
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
@@ -223,10 +189,11 @@ body {
 }
 
 .card-title {
-  font: normal 2.5rem/2.125rem var(--euclidflex-regular);
-  color: #fff;
+  font: normal 1.8rem/1.925rem var(--euclidflex-regular);
+  color: #e8a236; /* изменен цвет текста */
   margin-bottom: 20px;
 }
 .card-text {
-  font: normal 1.2rem/1.5rem var(--euclidflex-medium);
+  font: normal 1.1rem/1.35rem var(--euclidflex-medium);
+  color: #e8a236; /* изменен цвет текста */
 }

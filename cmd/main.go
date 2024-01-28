@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/markgregr/RIP/internal/api"
+	"backend/internal/api"
 )
 
 func main() {

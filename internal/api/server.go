@@ -14,17 +14,17 @@ import (
 
 func StartServer() {
 	log.Println("Server start up")
-	//Чтение baggage.json
-	file, err := os.Open("resources/data/baggage.json")
+	//Чтение ship.json
+	file, err := os.Open("resources/data/ship.json")
 	if err != nil {
 		log.Println("Ошибка при открытии JSON файла:", err)
 		return
 	}
 	defer file.Close()
 	//Декодирование JSON данных
-	var baggages []Baggage
+	var ships []Ship
 	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&baggages); err != nil {
+	if err := decoder.Decode(&ships); err != nil {
 		log.Println("Ошибка при декодировании JSON данных:", err)
 		return
 	}
@@ -45,20 +45,20 @@ func StartServer() {
 	})
 	//запрос на поиск
 	r.GET("/", func(c *gin.Context) {
-		searchQuery := c.DefaultQuery("seacrhQuery", "")
-		var foundBaggages []Baggage
-		for _, baggage := range baggages {
-			if strings.HasPrefix(strings.ToLower(baggage.BaggageCode), strings.ToLower(searchQuery)) {
-				foundBaggages = append(foundBaggages, baggage)
+		shipName := c.DefaultQuery("shipName", "")
+		var foundShips []Ship
+		for _, ship := range ships {
+			if strings.HasPrefix(strings.ToLower(ship.ShipName), strings.ToLower(shipName)) {
+				foundShips = append(foundShips, ship)
 			}
 		}
 		data := gin.H{
-			"baggages": foundBaggages,
+			"ships": foundShips,
 		}
 		c.HTML(http.StatusOK, "index.tmpl", data)
 	})
 	//Запрос на получения багажа по id
-	r.GET("/baggage/:id", func(c *gin.Context) {
+	r.GET("/ship/:id", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
@@ -67,8 +67,8 @@ func StartServer() {
 			return
 		}
 
-		baggage := baggages[id-1]
-		c.HTML(http.StatusOK, "card.tmpl", baggage)
+		ship := ships[id-1]
+		c.HTML(http.StatusOK, "card.tmpl", ship)
 	})
 
 	r.Run()
