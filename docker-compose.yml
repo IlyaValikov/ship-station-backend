@@ -1,7 +1,7 @@
 version: "3.8" # версия вашего docker-compose
 services: # имеджи, которые запустятся по вашему желанию
   db: # название моего имеджа
-    container_name: db
+    container_name: ShipStation
     image: postgres:16 # скачает image postgres 16 версии
     volumes: # часть настроек для хранения данных, пока для нас это не важно
       - type: volume
