@@ -24,24 +24,24 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
-func (r *Repository) GetBaggageByID(baggage_id int) (*ds.Baggage, error) {
-	baggage := &ds.Baggage{}
-	err := r.db.First(baggage, "baggage_id = ? AND baggage_status = ?", baggage_id, ds.BAGGAGE_STATUS_ACTIVE).Error // find product with id = 1
+func (r *Repository) GetShipByID(shipID uint) (*ds.Ship, error) {
+	ship := &ds.Ship{}
+	err := r.db.First(ship, "ship_id = ? AND ship_status = ?", shipID, ds.SHIP_STATUS_ACTIVE).Error
 	if err != nil {
 		return nil, err
 	}
-	return baggage, nil
+	return ship, nil
 }
 
-func (r *Repository) GetBaggages(searchCode string) ([]ds.Baggage,error) {
-	searchCode = strings.ToUpper(searchCode+"%")
-	var baggages []ds.Baggage
-	if err := r.db.Find(&baggages, "baggage_status = ? AND baggage_code LIKE ?", ds.BAGGAGE_STATUS_ACTIVE, searchCode).Error; err != nil {
+func (r *Repository) GetShips(shipName string) ([]ds.Ship,error) {
+	shipName = strings.ToUpper(shipName+"%")
+	var ships []ds.Ship
+	if err := r.db.Find(&ships, "ship_status = ? AND ship_name LIKE ?", ds.SHIP_STATUS_ACTIVE, shipName).Error; err != nil {
         return nil, err
     }
-	return baggages, nil
+	return ships, nil
 }
 
-func (r *Repository) DeleteBaggage(baggage_id int) error {
-	return r.db.Exec("UPDATE baggages SET baggage_status = ? WHERE baggage_id = ?", ds.BAGGAGE_STATUS_DELETED, baggage_id).Error
+func (r *Repository) DeleteShip(shipID uint) error {
+	return r.db.Exec("UPDATE ships SET ship_status = ? WHERE ship_id = ?", ds.SHIP_STATUS_DELETED, shipID).Error
 }

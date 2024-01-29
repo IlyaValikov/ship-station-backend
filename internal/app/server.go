@@ -63,47 +63,47 @@ func (app *Application) Run(){
 
 	r.GET("/", func(c *gin.Context) {
 		
-		searchCode := c.DefaultQuery("searchCode", "")
+		shipName := c.DefaultQuery("searchCode", "")
 
-		baggages, err := app.Repository.GetBaggages(searchCode)
+		ships, err := app.Repository.GetShips(shipName)
 		if err != nil {
 			log.Println("Error Repository method GetAll:", err)
 			return
 		}
 		data := gin.H{
-			"baggages": baggages,
-			"searchCode": searchCode,
+			"ships": ships,
+			"searchCode": shipName,
 		}
 		c.HTML(http.StatusOK, "index.tmpl", data)
 	})
 
-	r.GET("/baggage/:id", func(c *gin.Context) {
-		baggage_id, err := strconv.Atoi(c.Param("id"))
+	r.GET("/ship/:id", func(c *gin.Context) {
+		shipID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			// Обработка ошибки
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
 			return
 		}
 
-		baggage, err := app.Repository.GetBaggageByID(baggage_id)
+		ship, err := app.Repository.GetShipByID(uint(shipID))
 		if err != nil {
 			// Обработка ошибки
-			c.JSON(http.StatusBadRequest, gin.H{"error": "GetBaggageByID"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "GetShipByID"})
 			return
 		}
 
-		c.HTML(http.StatusOK, "card.tmpl", baggage)
+		c.HTML(http.StatusOK, "card.tmpl", ship)
 	})
 
-	r.POST("/baggage/:id/delete", func(c *gin.Context) {
+	r.DELETE("/ship/:id", func(c *gin.Context) {
 
-		baggage_id, err := strconv.Atoi(c.Param("id"))
+		shipID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
 			// Обработка ошибки
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
 			return
 		}
-		app.Repository.DeleteBaggage(baggage_id)
+		app.Repository.DeleteShip(uint(shipID))
 		c.Redirect(http.StatusMovedPermanently, "/")
 	})
     

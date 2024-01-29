@@ -17,7 +17,7 @@ func main() {
 	}
 
 	// Migrate the schema
-	err = db.AutoMigrate(&ds.Baggage{},&ds.Delivery{},&ds.DeliveryBagggage{},&ds.User{})
+	err = db.AutoMigrate(&ds.Ship{})
 	if err != nil {
 		panic("cant migrate db")
 	}

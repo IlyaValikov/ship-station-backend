@@ -1,16 +1,17 @@
-package api
+package ds
 
 import "time"
 
 const (
-	SHIP_STATUS_ACTIVE  = "активен"
-	SHIP_STATUS_DELETED = "удален"
+	SHIP_STATUS_ACTIVE  = "активно"
+	SHIP_STATUS_DELETED = "удалено"
 )
 
 type Ship struct {
 	ShipID            uint    `gorm:"primarykey" json:"ship_id"`
 	ShipName          string  `json:"ship_name"`
 	ShipType          string  `json:"ship_type"`
+	ShipStatus		  string  `json:"ship_status"`
 	CargoCapacity     float64 `json:"cargo_capacity"`
 	MaxDepth          float64 `json:"max_depth"`
 	MaxLength         float64 `json:"max_length"`
@@ -30,13 +31,12 @@ type Request struct {
 	CompletionDate  *time.Time `json:"completion_date"`
 	RequestStatus   string    `json:"request_status"`
 	UserID          uint      `json:"user_id"`
-	ModeratorID     *uint      `json:"moderator_id"`
+	ModeratorID     *uint     `json:"moderator_id"`
 }
 
 type RequestShip struct {
-	RequestShipID uint `gorm:"primarykey" json:"request_ship_id"`
-	RequestID     uint `json:"request_id"`
-	ShipID        uint `json:"ship_id"`
+	RequestID     uint `gorm:"type:serial;primaryKey;index" json:"request_id"`
+	ShipID        uint `gorm:"type:serial;primaryKey;index" json:"ship_id"`
 }
 
 type User struct {
