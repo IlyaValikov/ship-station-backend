@@ -53,25 +53,23 @@
       </div>
     </div>
 
-    <!-- Список багажей в виде карточек -->
     <div class="container">
-      <!-- Обертка для строк с карточками -->
       <div class="row">
         {{ range.ships }}
         <div class="col-md-4">
           <div class="cards mb-4">
             <div class="card-about">
               <a href="/ship/{{.ShipID}}" class="card-link">
-                <!-- Добавляем класс card-link -->
                 <img
                   src="{{.Photo}}"
                   class="cards-img-top"
-                  alt="Изображение багажа"
+                  alt="Изображение судна"
                 />
                 <div class="cards-body">
                   <h5 class="cards-title">{{.ShipName}}</h5>
                 </div>
               </a>
+              <!-- Форма для кнопки "Удалить" -->
               <form
                 class="delete-form"
                 action="/ship/{{.ShipID}}"
@@ -84,10 +82,8 @@
             </div>
           </div>
         </div>
-
         {{ end }}
       </div>
-      <!-- Конец обертки для строк с карточками -->
     </div>
   </body>
 </html>
