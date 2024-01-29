@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/markgregr/RIP/internal/app"
+	"backend/internal/app"
 )
 
 func main() {

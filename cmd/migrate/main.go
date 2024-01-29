@@ -5,8 +5,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/markgregr/RIP/internal/app/ds"
-	"github.com/markgregr/RIP/internal/app/dsn"
+	"backend/internal/app/ds"
+	"backend/internal/app/dsn"
 )
 
 func main() {
