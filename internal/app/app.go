@@ -7,10 +7,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"backend/internal/app/config"
+	"backend/internal/app/dsn"
+	"backend/internal/app/repository"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/app/config"
-	"github.com/markgregr/RIP/internal/app/dsn"
-	"github.com/markgregr/RIP/internal/app/repository"
 )
 
 // Application представляет основное приложение.

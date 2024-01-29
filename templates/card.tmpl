@@ -29,21 +29,23 @@
       </a>
     </nav>
 
-    <!-- Контейнер с информацией о багаже по середине страницы -->
     <div class="container mt-4 text-center">
       <div class="col-md-6 mx-auto">
         <div class="card mb-4">
           <img src="{{.Photo}}" class="card-img-top" alt="Изображение судна" />
-          <div class="card-body d-flex flex-column align-items-center">
-            <h5 class="card-title">Код багажа: {{.BaggageCode}}</h5>
-            <p class="card-text">ФИО: {{.OwnerName}}</p>
-            <p class="card-text">Паспортные данные: {{.PasportDetails}}</p>
-            <p class="card-text">Авиакомпания: {{.Airline}}</p>
-            <p class="card-text">Вес: {{.Weight}} кг</p>
-            <p class="card-text">Статус: {{.BaggageStatus}}</p>
-            <p class="card-text">Тип: {{.BaggageType}}</p>
-            <p class="card-text">Размер: {{.Size}}</p>
-            <a class="btn" type="button" href="/">Весь багаж</a>
+          <div class="card-body">
+            <h5 class="card-title">Название судна: {{.ShipName}}</h5>
+            <p class="card-text">Тип судна: {{.ShipType}}</p>
+            <p class="card-text">Грузоподъемность: {{.CargoCapacity}} тонн</p>
+            <p class="card-text">Максимальная глубина: {{.MaxDepth}} м</p>
+            <p class="card-text">Максимальная длина: {{.MaxLength}} м</p>
+            <p class="card-text">Год постройки: {{.YearBuilt}}</p>
+            <p class="card-text">Флаг: {{.Flag}}</p>
+            <p class="card-text">Классификация: {{.Classification}}</p>
+            <p class="card-text">Вместимость экипажа: {{.CrewCapacity}} чел.</p>
+            <p class="card-text">
+              Пассажирская вместимость: {{.PassengerCapacity}} чел.
+            </p>
           </div>
         </div>
       </div>

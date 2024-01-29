@@ -3,7 +3,8 @@ package repository
 import (
 	"strings"
 
-	"github.com/markgregr/RIP/internal/app/ds"
+	"backend/internal/app/ds"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
