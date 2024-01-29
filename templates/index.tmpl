@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BagTracker</title>
+    <title>ShipStation</title>
     <!-- Подключение Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -18,45 +18,30 @@
       <a class="navbar-brand" href="/">
         <div class="brand-container">
           <img
-            src="/images/BagTracker.png"
+            src="/images/ShipStation.png"
             width="34"
             height="34"
             class="icon"
             alt="Icon"
           />
-          <h1 class="brand-name">BagTracker</h1>
+          <h1 class="brand-name">ShipStation</h1>
         </div>
       </a>
     </nav>
-
-    <!-- Контейнер с текстом над списком багажа -->
-    <div class="about-container">
-      <div class="content-container">
-        <h1 class="mb-4 page-title">Список багажей</h1>
-        <p class="about-information">
-          Добро пожаловать в BagTracker. BagTracker - ваш надежный спутник в
-          мире авиапутешествий. Наш сервис позволяет отслеживать текущее
-          местоположение вашего багажа и предоставляет информацию о его статусе
-          в реальном времени. Вы также можете использовать BagTracker для
-          удобного поиска вашего багажа по пункту назначения. С нашим сервисом
-          ваши вещи всегда под вашим контролем.
-        </p>
-      </div>
-    </div>
     <!-- Контейнер с текстом над списком багажа -->
     <div class="container mt-4">
       <div class="row">
         <div class="col-md-9 d-flex align-items-center">
-          <a class="btn btn-primary" type="button" href="/">Весь багаж</a>
+          <a class="btn btn-primary" type="button" href="/">Все судна</a>
           <form action="/" method="GET">
             <div class="input-group">
               <input
                 type="text"
                 class="form-control"
-                name="searchCode"
-                placeholder="Поиск багажа"
-                value="{{.searchCode}}"
-                aria-label="Поиск багажа"
+                name="shipName"
+                placeholder="Введите имя судна"
+                value="{{.shipName}}"
+                aria-label="Введите имя судна"
                 aria-describedby="search-button"
               />
               <div class="input-group-append">
@@ -72,28 +57,28 @@
     <div class="container">
       <!-- Обертка для строк с карточками -->
       <div class="row">
-        {{ range.baggages }}
+        {{ range.ships }}
         <div class="col-md-4">
           <div class="cards mb-4">
             <div class="card-about">
-              <a href="/baggage/{{.BaggageID}}" class="card-link">
+              <a href="/ship/{{.ShipID}}" class="card-link">
                 <!-- Добавляем класс card-link -->
                 <img
-                  src="{{.PhotoURL}}"
+                  src="{{.Photo}}"
                   class="cards-img-top"
                   alt="Изображение багажа"
                 />
                 <div class="cards-body">
-                  <h5 class="cards-title">Код багажа: {{.BaggageCode}}</h5>
+                  <h5 class="cards-title">{{.ShipName}}</h5>
                 </div>
               </a>
               <form
                 class="delete-form"
-                action="/baggage/{{.BaggageID}}/delete"
+                action="/ship/{{.ShipID}}/delete"
                 method="POST"
               >
                 <button class="btn btn-primary mx-auto" type="submit">
-                  Удалить багаж
+                  Удалить судно
                 </button>
               </form>
             </div>

@@ -11,7 +11,7 @@ services: # имеджи, которые запустятся по вашему 
       - "5432:5432"
     environment: # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
       POSTGRES_USER: admin
-      POSTGRES_DB: RIP
+      POSTGRES_DB: ShipStation
       POSTGRES_PASSWORD: qwerty
 
 volumes: # часть настроек для хранения данных
