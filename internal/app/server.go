@@ -63,7 +63,7 @@ func (app *Application) Run(){
 
 	r.GET("/", func(c *gin.Context) {
 		
-		shipName := c.DefaultQuery("searchCode", "")
+		shipName := c.DefaultQuery("shipName", "")
 
 		ships, err := app.Repository.GetShips(shipName)
 		if err != nil {
@@ -72,7 +72,7 @@ func (app *Application) Run(){
 		}
 		data := gin.H{
 			"ships": ships,
-			"searchCode": shipName,
+			"shipName": shipName,
 		}
 		c.HTML(http.StatusOK, "index.tmpl", data)
 	})
@@ -95,7 +95,7 @@ func (app *Application) Run(){
 		c.HTML(http.StatusOK, "card.tmpl", ship)
 	})
 
-	r.DELETE("/ship/:id", func(c *gin.Context) {
+	r.POST("/ship/:id", func(c *gin.Context) {
 
 		shipID, err := strconv.Atoi(c.Param("id"))
 		if err != nil {

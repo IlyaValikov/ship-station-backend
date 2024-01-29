@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"strings"
-
 	"backend/internal/app/ds"
+	"strings"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -33,14 +32,14 @@ func (r *Repository) GetShipByID(shipID uint) (*ds.Ship, error) {
 	return ship, nil
 }
 
-func (r *Repository) GetShips(shipName string) ([]ds.Ship,error) {
-	shipName = strings.ToUpper(shipName+"%")
-	var ships []ds.Ship
-	if err := r.db.Find(&ships, "ship_status = ? AND ship_name LIKE ?", ds.SHIP_STATUS_ACTIVE, shipName).Error; err != nil {
-        return nil, err
-    }
-	return ships, nil
-}
+	func (r *Repository) GetShips(shipName string) ([]ds.Ship,error) {
+		shipName = strings.ToLower(shipName+"%")
+		var ships []ds.Ship
+		if err := r.db.Find(&ships, "ship_status = ? AND LOWER(ship_name) LIKE ?", ds.SHIP_STATUS_ACTIVE, shipName).Error; err != nil {
+			return nil, err
+		}
+		return ships, nil
+	}
 
 func (r *Repository) DeleteShip(shipID uint) error {
 	return r.db.Exec("UPDATE ships SET ship_status = ? WHERE ship_id = ?", ds.SHIP_STATUS_DELETED, shipID).Error
