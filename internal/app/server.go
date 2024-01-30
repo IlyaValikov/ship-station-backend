@@ -22,7 +22,7 @@ func (app *Application) Run() {
 	docs.SwaggerInfo.BasePath = "/"
     r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-    ShipGroup := r.Group("/baggage")
+    ShipGroup := r.Group("/ship")
     {   
         ShipGroup.GET("/", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetShips)
         ShipGroup.GET("/:shipID", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetShipByID)
