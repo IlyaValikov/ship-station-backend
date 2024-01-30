@@ -3,11 +3,11 @@ package app
 import (
 	"context"
 
-	"github.com/markgregr/RIP/internal/config"
-	"github.com/markgregr/RIP/internal/dsn"
-	Request "github.com/markgregr/RIP/internal/http/delivery"
-	"github.com/markgregr/RIP/internal/http/repository"
-	"github.com/markgregr/RIP/internal/http/usecase"
+	"backend/internal/config"
+	"backend/internal/dsn"
+	Request "backend/internal/http/delivery"
+	"backend/internal/http/repository"
+	"backend/internal/http/usecase"
 )
 
 // Application представляет основное приложение.

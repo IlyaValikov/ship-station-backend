@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"backend/internal/auth"
+	"backend/internal/model"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/auth"
-	"github.com/markgregr/RIP/internal/model"
 )
 
 // GetRequests godoc

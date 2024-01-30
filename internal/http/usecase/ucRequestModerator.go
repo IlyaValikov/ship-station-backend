@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/markgregr/RIP/internal/model"
+	"backend/internal/model"
 )
 
 func (uc *UseCase) GetRequestsModerator(startFormationDate, endFormationDate, requestsStatus string) ([]model.GetRequests, error) {

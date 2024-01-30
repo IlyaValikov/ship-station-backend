@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/markgregr/RIP/internal/model"
+	"backend/internal/model"
 )
 
 func (r *Repository) GetShips(shipName string, userID uint) (model.GetShips, error) {
