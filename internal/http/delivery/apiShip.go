@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/auth"
 	"github.com/markgregr/RIP/internal/model"
+	"github.com/markgregr/RIP/internal/pkg/middleware"
 )
 
 // @Summary Получение списка судов
@@ -20,8 +20,13 @@ import (
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Router /ship [get]
 func (h *Handler) GetShips(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
+
     shipName := c.DefaultQuery("shipName", "")
 
     ships, err := h.UseCase.GetShips(shipName,userID)
@@ -43,8 +48,12 @@ func (h *Handler) GetShips(c *gin.Context) {
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Router /ship/{shipID} [get]
 func (h *Handler) GetShipByID(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
@@ -76,8 +85,12 @@ func (h *Handler) GetShipByID(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship [post]
 func (h *Handler) CreateShip(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     shipName := c.DefaultQuery("shipName", "")
 
@@ -88,7 +101,7 @@ func (h *Handler) CreateShip(c *gin.Context) {
 		return
 	}
 
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         err := h.UseCase.CreateShip(userID, ship)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -122,8 +135,12 @@ func (h *Handler) CreateShip(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID} [delete]
 func (h *Handler) DeleteShip(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	
     shipName := c.DefaultQuery("shipName", "")
 
@@ -133,7 +150,7 @@ func (h *Handler) DeleteShip(c *gin.Context) {
 		return
 	}
 
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c){
         err = h.UseCase.DeleteShip(uint(shipID), userID)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -167,8 +184,12 @@ func (h *Handler) DeleteShip(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID} [put]
 func (h *Handler) UpdateShip(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
@@ -182,7 +203,7 @@ func (h *Handler) UpdateShip(c *gin.Context) {
         return
     }
     
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         err = h.UseCase.UpdateShip(uint(shipID),uint(userID), ship)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -215,8 +236,12 @@ func (h *Handler) UpdateShip(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID}/request [post]
 func (h *Handler) AddShipToRequest(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     shipName := c.DefaultQuery("shipName", "")
 
@@ -254,8 +279,12 @@ func (h *Handler) AddShipToRequest(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID}/request [delete]
 func (h *Handler) RemoveShipFromRequest(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     shipName := c.DefaultQuery("shipName", "")
 
@@ -295,8 +324,12 @@ func (h *Handler) RemoveShipFromRequest(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID}/image [post]
 func (h* Handler) AddShipImage(c* gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
@@ -325,7 +358,7 @@ func (h* Handler) AddShipImage(c* gin.Context) {
 
 	contentType := image.Header.Get("Content-Type")
     
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c){
         err = h.UseCase.AddShipImage(uint(shipID), uint(userID),imageBytes, contentType)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

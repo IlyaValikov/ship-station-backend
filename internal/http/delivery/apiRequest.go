@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/auth"
 	"github.com/markgregr/RIP/internal/model"
+	"github.com/markgregr/RIP/internal/pkg/middleware"
 )
 
 // GetRequests godoc
@@ -24,8 +24,12 @@ import (
 // @Security ApiKeyAuth
 // @Router /request [get]
 func (h *Handler) GetRequests(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     startFormationDate := c.DefaultQuery("startFormationDate", "")
     endFormationDate := c.DefaultQuery("endFormationDate", "")
@@ -34,7 +38,7 @@ func (h *Handler) GetRequests(c *gin.Context) {
     var requests []model.GetRequests
     var err error
 
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         requests, err = h.UseCase.GetRequestsModerator(startFormationDate, endFormationDate, requestStatus)  
     } else {
         requests, err = h.UseCase.GetRequestsUser(startFormationDate, endFormationDate, requestStatus, userID)
@@ -60,8 +64,12 @@ func (h *Handler) GetRequests(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /request/{requestID} [get]
 func (h *Handler) GetRequestByID(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
@@ -71,7 +79,7 @@ func (h *Handler) GetRequestByID(c *gin.Context) {
 
     var request model.GetRequestByID
 
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         request, err = h.UseCase.GetRequestByIDModerator(uint(requestID)) 
     } else {
         request, err = h.UseCase.GetRequestByIDUser(uint(requestID), userID)
@@ -101,8 +109,12 @@ func (h *Handler) GetRequestByID(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /request/{requestID} [delete]
 func (h *Handler) DeleteRequest(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     startFormationDate := c.DefaultQuery("startFormationDate", "")
     endFormationDate := c.DefaultQuery("endFormationDate", "")
@@ -113,7 +125,7 @@ func (h *Handler) DeleteRequest(c *gin.Context) {
         return
     }
 
-    if authInstance.Role == "модератор"{
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         err = h.UseCase.DeleteRequestUser(uint(requestID), userID)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -153,8 +165,12 @@ func (h *Handler) DeleteRequest(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /request/{requestID}/status/user [put]
 func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
@@ -162,7 +178,7 @@ func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
         return
     }
 
-    if authInstance.Role == "модератор" {
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         err = h.UseCase.UpdateRequestStatusUser(uint(requestID), userID)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -208,8 +224,12 @@ func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /request/{requestID}/status/moderator [put]
 func (h *Handler) UpdateRequestStatusModerator(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-	userID := uint(authInstance.UserID)
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
     requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
@@ -223,7 +243,7 @@ func (h *Handler) UpdateRequestStatusModerator(c *gin.Context) {
         return
     }
 
-    if authInstance.Role == "модератор" {
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
         err = h.UseCase.UpdateRequestStatusModerator(uint(requestID), userID, requestStatus)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
