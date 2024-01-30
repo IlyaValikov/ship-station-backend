@@ -4,8 +4,9 @@ import (
 	"errors"
 	"time"
 
+	"backend/internal/model"
+
 	"github.com/golang-jwt/jwt"
-	"github.com/markgregr/RIP/internal/model"
 )
 
 func GenerateJWTAccessToken(userID uint) (model.Token, error) {

@@ -1,0 +1,732 @@
+basePath: /
+definitions:
+  model.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  model.GetRequestByID:
+    properties:
+      completion_date:
+        type: string
+      creation_date:
+        type: string
+      formation_date:
+        type: string
+      full_name:
+        type: string
+      request_id:
+        type: integer
+      request_status:
+        type: string
+      ships:
+        items:
+          $ref: '#/definitions/model.Ship'
+        type: array
+    type: object
+  model.GetRequests:
+    properties:
+      completion_date:
+        type: string
+      creation_date:
+        type: string
+      formation_date:
+        type: string
+      full_name:
+        type: string
+      request_id:
+        type: integer
+      request_status:
+        type: string
+    type: object
+  model.GetShips:
+    properties:
+      request_id:
+        type: integer
+      ships:
+        items:
+          $ref: '#/definitions/model.Ship'
+        type: array
+    type: object
+  model.Role:
+    enum:
+    - пользователь
+    - модератор
+    type: string
+    x-enum-varnames:
+    - UserRole
+    - ModeratorRole
+  model.Ship:
+    properties:
+      cargo_capacity:
+        type: number
+      classification:
+        type: string
+      crew_capacity:
+        type: integer
+      flag:
+        type: string
+      max_depth:
+        type: number
+      max_length:
+        type: number
+      passenger_capacity:
+        type: integer
+      photo:
+        type: string
+      ship_id:
+        type: integer
+      ship_name:
+        type: string
+      ship_status:
+        type: string
+      ship_type:
+        type: string
+      year_built:
+        type: integer
+    type: object
+  model.ShipChange:
+    properties:
+      cargo_capacity:
+        type: number
+      classification:
+        type: string
+      crew_capacity:
+        type: integer
+      flag:
+        type: string
+      max_depth:
+        type: number
+      max_length:
+        type: number
+      passenger_capacity:
+        type: integer
+      ship_name:
+        type: string
+      ship_type:
+        type: string
+      year_built:
+        type: integer
+    type: object
+  model.StatusRequest:
+    properties:
+      request_status:
+        type: string
+    type: object
+  model.UserLoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.UserLoginResponse:
+    properties:
+      access_token:
+        type: string
+      full_name:
+        type: string
+      role:
+        $ref: '#/definitions/model.Role'
+    type: object
+  model.UserRegisterRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      password:
+        type: string
+    type: object
+host: http://localhost:8080
+info:
+  contact: {}
+  description: API server for ShipStation application
+  title: ShipStation RestAPI
+  version: "1.0"
+paths:
+  /request:
+    get:
+      description: Возвращает список всех не удаленных заявок
+      parameters:
+      - description: Начало даты формирования
+        format: email
+        in: query
+        name: startFormationDate
+        type: string
+      - description: Конец даты формирования
+        format: email
+        in: query
+        name: endFormationDate
+        type: string
+      - description: Статус заявки
+        format: email
+        in: query
+        name: requestStatus
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список заявок
+          schema:
+            $ref: '#/definitions/model.GetRequests'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Получение списка заявок
+      tags:
+      - Заявка
+  /request/{requestID}:
+    delete:
+      description: Удаляет заявку по её идентификатору
+      parameters:
+      - description: Идентификатор заявки
+        in: path
+        name: requestID
+        required: true
+        type: integer
+      - description: Номер рейса
+        format: email
+        in: query
+        name: searchFlightNumber
+        type: string
+      - description: Начало даты формирования
+        format: email
+        in: query
+        name: startFormationDate
+        type: string
+      - description: Конец даты формирования
+        format: email
+        in: query
+        name: endFormationDate
+        type: string
+      - description: Статус заявки
+        format: email
+        in: query
+        name: requestStatus
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список заявок
+          schema:
+            $ref: '#/definitions/model.GetRequests'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Удаление заявки
+      tags:
+      - Заявка
+    get:
+      description: Возвращает информацию о заявке по её идентификатору
+      parameters:
+      - description: Идентификатор заявки
+        in: path
+        name: requestID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о заявке
+          schema:
+            $ref: '#/definitions/model.GetRequestByID'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Получение заявки по идентификатору
+      tags:
+      - Заявка
+  /request/{requestID}/status/moderator:
+    put:
+      description: Обновляет статус заявки для модератора по идентификатору заявки
+      parameters:
+      - description: Идентификатор заявки
+        in: path
+        name: requestID
+        required: true
+        type: integer
+      - description: Новый статус заявки
+        in: body
+        name: requestStatus
+        required: true
+        schema:
+          $ref: '#/definitions/model.StatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о заявке
+          schema:
+            $ref: '#/definitions/model.GetRequestByID'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Обновление статуса заявки для модератора
+      tags:
+      - Заявка
+  /request/{requestID}/status/user:
+    put:
+      description: Обновляет статус заявки для пользователя по идентификатору заявки
+      parameters:
+      - description: Идентификатор заявки
+        in: path
+        name: requestID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о заявке
+          schema:
+            $ref: '#/definitions/model.GetRequestByID'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Обновление статуса заявки для пользователя
+      tags:
+      - Заявка
+  /ship:
+    get:
+      description: Возращает список всех активных судов
+      parameters:
+      - description: Название судна
+        format: email
+        in: query
+        name: shipName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список судов
+          schema:
+            $ref: '#/definitions/model.GetShips'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Получение списка судов
+      tags:
+      - Судно
+    post:
+      consumes:
+      - application/json
+      description: Создает новое судно с предоставленными данными
+      parameters:
+      - description: Название судна
+        format: email
+        in: query
+        name: shipName
+        type: string
+      - description: Пользовательский объект в формате JSON
+        in: body
+        name: ship
+        required: true
+        schema:
+          $ref: '#/definitions/model.ShipChange'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список судов
+          schema:
+            $ref: '#/definitions/model.GetShips'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "403":
+          description: У пользователя нет прав для этого запроса
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Создание нового судна
+      tags:
+      - Судно
+  /ship/{shipID}:
+    delete:
+      description: Удаляет судно по его ID
+      parameters:
+      - description: ID судна
+        in: path
+        name: shipID
+        required: true
+        type: integer
+      - description: Название судна
+        format: email
+        in: query
+        name: shipName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список судов
+          schema:
+            $ref: '#/definitions/model.GetShips'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "403":
+          description: У пользователя нет прав для этого запроса
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Удаление судна
+      tags:
+      - Судно
+    get:
+      description: Возвращает информацию о суднe по его ID
+      parameters:
+      - description: ID судна
+        in: path
+        name: shipID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о суднe
+          schema:
+            $ref: '#/definitions/model.Ship'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Получение судна по ID
+      tags:
+      - Судно
+    put:
+      consumes:
+      - application/json
+      description: Обновляет информацию о суднe по его ID
+      parameters:
+      - description: ID судна
+        in: path
+        name: shipID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о суднe
+          schema:
+            $ref: '#/definitions/model.Ship'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "403":
+          description: У пользователя нет прав для этого запроса
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Обновление информации о суднe
+      tags:
+      - Судно
+  /ship/{shipID}/image:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Добавляет изображение к судноу по его ID
+      parameters:
+      - description: ID судна
+        in: path
+        name: shipID
+        required: true
+        type: integer
+      - description: Изображение судна
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о суднe с изображением
+          schema:
+            $ref: '#/definitions/model.Ship'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "403":
+          description: У пользователя нет прав для этого запроса
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Добавление изображения к судноу
+      tags:
+      - Судно
+  /ship/{shipID}/request:
+    delete:
+      description: Удаляет судно из доставки по его ID
+      parameters:
+      - description: ID судна
+        in: path
+        name: shipID
+        required: true
+        type: integer
+      - description: Название судна
+        format: email
+        in: query
+        name: shipName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список судов
+          schema:
+            $ref: '#/definitions/model.GetShips'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Удаление судна из доставки
+      tags:
+      - Судно
+    post:
+      description: Добавляет судно к доставке по его ID
+      parameters:
+      - description: ID судна
+        in: path
+        name: shipID
+        required: true
+        type: integer
+      - description: Название судна
+        format: email
+        in: query
+        name: shipName
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список судов
+          schema:
+            $ref: '#/definitions/model.GetShips'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Добавление судна к доставке
+      tags:
+      - Судно
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизация пользователя и генерация JWT-токена
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Токен
+          schema:
+            $ref: '#/definitions/model.UserLoginResponse'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Вход пользователя
+      tags:
+      - Пользователь
+  /user/logout:
+    post:
+      description: Выход пользователя из системы и удаление токена из куков
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            type: string
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Выход пользователя
+      tags:
+      - Пользователь
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя с предоставленной информацией.
+      parameters:
+      - description: Пользовательский объект в формате JSON
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Токен
+          schema:
+            $ref: '#/definitions/model.UserLoginResponse'
+        "400":
+          description: Обработанная ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            type: string
+      summary: Регистрация нового пользователя.
+      tags:
+      - Пользователь
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

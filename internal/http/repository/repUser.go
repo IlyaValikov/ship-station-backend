@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 
-	"github.com/markgregr/RIP/internal/model"
+	"backend/internal/model"
 )
 
 type UserRepository interface {

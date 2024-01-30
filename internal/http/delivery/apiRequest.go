@@ -4,9 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"backend/internal/model"
+	"backend/internal/pkg/middleware"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/model"
-	"github.com/markgregr/RIP/internal/pkg/middleware"
 )
 
 // GetRequests godoc
@@ -216,7 +217,7 @@ func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
 // @Tags Заявка
 // @Produce json
 // @Param requestID path int true "Идентификатор заявки"
-// @Param requestStatus body model.RequestUpdateStatusRequest true "Новый статус заявки"
+// @Param requestStatus body model.StatusRequest true "Новый статус заявки"
 // @Success 200 {object} model.GetRequestByID "Информация о заявке"
 // @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
 // @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"

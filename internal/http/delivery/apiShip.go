@@ -5,9 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"backend/internal/model"
+	"backend/internal/pkg/middleware"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/model"
-	"github.com/markgregr/RIP/internal/pkg/middleware"
 )
 
 // @Summary Получение списка судов
@@ -76,7 +77,7 @@ func (h *Handler) GetShipByID(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param shipName query string false "Название судна" Format(email)
-// @Param ship body model.ShipRequest true "Пользовательский объект в формате JSON"
+// @Param ship body model.ShipChange true "Пользовательский объект в формате JSON"
 // @Success 200 {object} model.GetShips "Список судов"
 // @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
 // @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"

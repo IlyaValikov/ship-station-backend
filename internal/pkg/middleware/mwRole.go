@@ -3,9 +3,10 @@ package middleware
 import (
 	"net/http"
 
+	"backend/internal/http/repository"
+	"backend/internal/model"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/http/repository"
-	"github.com/markgregr/RIP/internal/model"
 )
 
 func ModeratorOnly(r *repository.Repository, c *gin.Context) bool {

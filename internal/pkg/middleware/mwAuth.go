@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"backend/internal/http/repository"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
-	"github.com/markgregr/RIP/internal/http/repository"
 )
 
 func Authenticate(redisClient *redis.Client, jwtSecretKey []byte, r *repository.Repository) gin.HandlerFunc {

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"log"
 
+	"backend/docs"
+	"backend/internal/pkg/middleware"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/docs"
-	"github.com/markgregr/RIP/internal/pkg/middleware"
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )

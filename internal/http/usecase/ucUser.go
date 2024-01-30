@@ -3,8 +3,8 @@ package usecase
 import (
 	"errors"
 
-	"github.com/markgregr/RIP/internal/model"
-	"github.com/markgregr/RIP/internal/pkg/middleware"
+	"backend/internal/model"
+	"backend/internal/pkg/middleware"
 )
 
 type UserUseCase interface {

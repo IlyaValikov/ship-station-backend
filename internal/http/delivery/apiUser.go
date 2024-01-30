@@ -3,8 +3,9 @@ package delivery
 import (
 	"net/http"
 
+	"backend/internal/model"
+
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/internal/model"
 )
 
 // @BasePath /user/register
