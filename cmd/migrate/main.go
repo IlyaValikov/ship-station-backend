@@ -5,21 +5,20 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"backend/internal/app/ds"
-	"backend/internal/app/dsn"
+	"github.com/markgregr/RIP/internal/dsn"
+	"github.com/markgregr/RIP/internal/model"
 )
 
 func main() {
-	_ = godotenv.Load()
-	db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
+    _ = godotenv.Load()
+    db, err := gorm.Open(postgres.Open(dsn.FromEnv()), &gorm.Config{})
+    if err != nil {
+        panic("failed to connect database")
+    }
 
-	// Migrate the schema
-	err = db.AutoMigrate(&ds.Ship{})
-	if err != nil {
-		panic("cant migrate db")
-	}
-	
+    // Явно мигрировать только нужные таблицы
+    err = db.AutoMigrate(&model.Baggage{},&model.Delivery{}, &model.User{}, &model.DeliveryBaggage{})
+    if err != nil {
+        panic("cant migrate db")
+    }
 }

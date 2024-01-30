@@ -1,113 +1,52 @@
 package app
 
 import (
-	"context"
 	"fmt"
 	"log"
-	"net/http"
-	"strconv"
 
-	"backend/internal/app/config"
-	"backend/internal/app/dsn"
-	"backend/internal/app/repository"
-
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/markgregr/RIP/docs"
+	swaggerFiles "github.com/swaggo/files"     // swagger embed files
+	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
-// Application представляет основное приложение.
-type Application struct {
-    Config       *config.Config
-    Repository   *repository.Repository
-    RequestLimit int
-}
-
-// New создает новый объект Application и настраивает его.
-func New(ctx context.Context) (*Application, error) {
-    // Инициализируйте конфигурацию
-    cfg, err := config.NewConfig(ctx)
-    if err != nil {
-        return nil, err
-    }
-
-    // Инициализируйте подключение к базе данных (DB)
-    repo, err := repository.New(dsn.FromEnv())
-    if err != nil {
-        return nil, err
-    }
-
-    // Инициализируйте и настройте объект Application
-    app := &Application{
-        Config: cfg,
-        Repository: repo,
-        // Установите другие параметры вашего приложения, если необходимо
-    }
-
-    return app, nil
-}
-
 // Run запускает приложение.
-func (app *Application) Run(){
+func (app *Application) Run() {
     r := gin.Default()
-
-	r.LoadHTMLGlob("templates/*")
-	r.Static("/css", "./resources/css")
-	r.Static("/data", "./resources/data")
-	r.Static("/images", "./resources/images")
-	r.Static("/fonts", "./resources/fonts")
+    r.Use(cors.Default())  
+    // Это нужно для автоматического создания папки "docs" в вашем проекте
+    docs.SwaggerInfo.Title = "BagTracker RestAPI"
+    docs.SwaggerInfo.Description = "API server for BagTracker application"
+    docs.SwaggerInfo.Version = "1.0"
+    docs.SwaggerInfo.Host = "localhost:8081"
+    docs.SwaggerInfo.BasePath = "/"
+    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+    // Группа запросов для багажа
+    BaggageGroup := r.Group("/baggage")
+    {   
+        BaggageGroup.GET("/", app.Handler.GetBaggages)
+        BaggageGroup.GET("/:baggage_id", app.Handler.GetBaggageByID) 
+        BaggageGroup.DELETE("/:baggage_id/delete", app.Handler.DeleteBaggage) 
+        BaggageGroup.POST("/create", app.Handler.CreateBaggage)
+        BaggageGroup.PUT("/:baggage_id/update", app.Handler.UpdateBaggage) 
+        BaggageGroup.POST("/:baggage_id/delivery", app.Handler.AddBaggageToDelivery) 
+        BaggageGroup.DELETE("/:baggage_id/delivery/delete", app.Handler.RemoveBaggageFromDelivery)
+        BaggageGroup.POST("/:baggage_id/image",app.Handler.AddBaggageImage)
+    }
     
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+    // Группа запросов для доставки
+    DeliveryGroup := r.Group("/delivery")
+    {
+        DeliveryGroup.GET("/", app.Handler.GetDeliveries)
+        DeliveryGroup.GET("/:id", app.Handler.GetDeliveryByID)
+        DeliveryGroup.DELETE("/:id/delete", app.Handler.DeleteDelivery)
+        DeliveryGroup.PUT("/:id/update", app.Handler.UpdateDeliveryFlightNumber)
+        DeliveryGroup.PUT("/:id/status/user", app.Handler.UpdateDeliveryStatusUser)  // Новый маршрут для обновления статуса доставки пользователем
+        DeliveryGroup.PUT("/:id/status/moderator", app.Handler.UpdateDeliveryStatusModerator)  // Новый маршрут для обновления статуса доставки модератором
+    }
 
-	r.GET("/", func(c *gin.Context) {
-		
-		shipName := c.DefaultQuery("shipName", "")
-
-		ships, err := app.Repository.GetShips(shipName)
-		if err != nil {
-			log.Println("Error Repository method GetAll:", err)
-			return
-		}
-		data := gin.H{
-			"ships": ships,
-			"shipName": shipName,
-		}
-		c.HTML(http.StatusOK, "index.tmpl", data)
-	})
-
-	r.GET("/ship/:id", func(c *gin.Context) {
-		shipID, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			// Обработка ошибки
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
-			return
-		}
-
-		ship, err := app.Repository.GetShipByID(uint(shipID))
-		if err != nil {
-			// Обработка ошибки
-			c.JSON(http.StatusBadRequest, gin.H{"error": "GetShipByID"})
-			return
-		}
-
-		c.HTML(http.StatusOK, "card.tmpl", ship)
-	})
-
-	r.POST("/ship/:id", func(c *gin.Context) {
-
-		shipID, err := strconv.Atoi(c.Param("id"))
-		if err != nil {
-			// Обработка ошибки
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
-			return
-		}
-		app.Repository.DeleteShip(uint(shipID))
-		c.Redirect(http.StatusMovedPermanently, "/")
-	})
-    
-	addr := fmt.Sprintf("%s:%d", app.Config.ServiceHost, app.Config.ServicePort)
+    addr := fmt.Sprintf("%s:%d", app.Config.ServiceHost, app.Config.ServicePort)
     r.Run(addr)
-	log.Println("Server down")
+    log.Println("Server down")
 }
