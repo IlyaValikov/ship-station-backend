@@ -16,7 +16,7 @@ func (r *Repository) GetShips(shipName string, userID uint) (model.GetShips, err
 
     var ships []model.Ship
     if err := r.db.Table("ships").
-        Where("ships.ship_status = ? AND ships.ship_name LIKE ?", model.SHIP_STATUS_ACTIVE, shipName).
+        Where("ships.ship_status = ? AND LOWER(ships.ship_name) LIKE ?", model.SHIP_STATUS_ACTIVE, shipName).
         Scan(&ships).Error; err != nil {
         return model.GetShips{}, errors.New("ошибка нахождения списка судов")
     }
