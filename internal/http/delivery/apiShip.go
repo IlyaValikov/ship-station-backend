@@ -224,8 +224,8 @@ func (h *Handler) UpdateShip(c *gin.Context) {
     }
 }
 
-// @Summary Добавление судна к доставке
-// @Description Добавляет судно к доставке по его ID
+// @Summary Добавление судна к заявке
+// @Description Добавляет судно к заявке по его ID
 // @Tags Судно
 // @Produce json
 // @Param shipID path int true "ID судна"
@@ -267,8 +267,8 @@ func (h *Handler) AddShipToRequest(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"ships": ships.Ships, "requestID":ships.RequestID})
 }
 
-// @Summary Удаление судна из доставки
-// @Description Удаляет судно из доставки по его ID
+// @Summary Удаление судна из заявки
+// @Description Удаляет судно из заявки по его ID
 // @Tags Судно
 // @Produce json
 // @Param shipID path int true "ID судна"
