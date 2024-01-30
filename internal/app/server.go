@@ -6,44 +6,33 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/markgregr/RIP/docs"
-	swaggerFiles "github.com/swaggo/files"     // swagger embed files
-	ginSwagger "github.com/swaggo/gin-swagger" // gin-swagger middleware
 )
 
 // Run запускает приложение.
 func (app *Application) Run() {
     r := gin.Default()
     r.Use(cors.Default())  
-    // Это нужно для автоматического создания папки "docs" в вашем проекте
-    docs.SwaggerInfo.Title = "BagTracker RestAPI"
-    docs.SwaggerInfo.Description = "API server for BagTracker application"
-    docs.SwaggerInfo.Version = "1.0"
-    docs.SwaggerInfo.Host = "localhost:8081"
-    docs.SwaggerInfo.BasePath = "/"
-    r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-    // Группа запросов для багажа
-    BaggageGroup := r.Group("/baggage")
+
+    ShipGroup := r.Group("/ship")
     {   
-        BaggageGroup.GET("/", app.Handler.GetBaggages)
-        BaggageGroup.GET("/:baggage_id", app.Handler.GetBaggageByID) 
-        BaggageGroup.DELETE("/:baggage_id/delete", app.Handler.DeleteBaggage) 
-        BaggageGroup.POST("/create", app.Handler.CreateBaggage)
-        BaggageGroup.PUT("/:baggage_id/update", app.Handler.UpdateBaggage) 
-        BaggageGroup.POST("/:baggage_id/delivery", app.Handler.AddBaggageToDelivery) 
-        BaggageGroup.DELETE("/:baggage_id/delivery/delete", app.Handler.RemoveBaggageFromDelivery)
-        BaggageGroup.POST("/:baggage_id/image",app.Handler.AddBaggageImage)
+        ShipGroup.GET("/", app.Handler.GetShips)
+        ShipGroup.GET("/:shipID", app.Handler.GetShipByID) 
+        ShipGroup.DELETE("/:shipID", app.Handler.DeleteShip) 
+        ShipGroup.POST("/", app.Handler.CreateShip)
+        ShipGroup.PUT("/:shipID", app.Handler.UpdateShip) 
+        ShipGroup.POST("/:shipID/request", app.Handler.AddShipToRequest) 
+        ShipGroup.DELETE("/:shipID/request", app.Handler.RemoveShipFromRequest)
+        ShipGroup.POST("/:shipID/image",app.Handler.AddShipImage)
     }
     
-    // Группа запросов для доставки
-    DeliveryGroup := r.Group("/delivery")
+    // Группа запросов для заявки
+    RequestGroup := r.Group("/request")
     {
-        DeliveryGroup.GET("/", app.Handler.GetDeliveries)
-        DeliveryGroup.GET("/:id", app.Handler.GetDeliveryByID)
-        DeliveryGroup.DELETE("/:id/delete", app.Handler.DeleteDelivery)
-        DeliveryGroup.PUT("/:id/update", app.Handler.UpdateDeliveryFlightNumber)
-        DeliveryGroup.PUT("/:id/status/user", app.Handler.UpdateDeliveryStatusUser)  // Новый маршрут для обновления статуса доставки пользователем
-        DeliveryGroup.PUT("/:id/status/moderator", app.Handler.UpdateDeliveryStatusModerator)  // Новый маршрут для обновления статуса доставки модератором
+        RequestGroup.GET("/", app.Handler.GetRequests)
+        RequestGroup.GET("/:requestID", app.Handler.GetRequestByID)
+        RequestGroup.DELETE("/:requestID", app.Handler.DeleteRequest)
+        RequestGroup.PUT("/:requestID/status/user", app.Handler.UpdateRequestStatusUser) 
+        RequestGroup.PUT("/:requestID/status/moderator", app.Handler.UpdateRequestStatusModerator)  
     }
 
     addr := fmt.Sprintf("%s:%d", app.Config.ServiceHost, app.Config.ServicePort)

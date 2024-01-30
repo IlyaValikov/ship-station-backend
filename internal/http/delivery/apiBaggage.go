@@ -10,253 +10,333 @@ import (
 	"github.com/markgregr/RIP/internal/model"
 )
 
-// @Summary Получение списка багажа
-// @Description Возращает список всех активных багажей
-// @Tags Багаж
+// @Summary Получение списка судов
+// @Description Возращает список всех активных судов
+// @Tags Судно
 // @Produce json
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.BaggagesGetResponse "Список багажей"
-// @Failure 500 {object} model.BaggagesGetResponse "Ошибка сервера"
-// @Router /baggage [get]
-func (h *Handler) GetBaggages(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-    searchCode := c.DefaultQuery("searchCode", "")
+// @Param shipName query string false "Название судна" Format(email)
+// @Success 200 {object} model.GetShips "Список судов"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Router /ship [get]
+func (h *Handler) GetShips(c *gin.Context) {
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
+    shipName := c.DefaultQuery("shipName", "")
 
-    baggages, err := h.UseCase.GetBaggages(searchCode, authInstance.UserID)
+    ships, err := h.UseCase.GetShips(shipName,userID)
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
     
-    c.JSON(http.StatusOK, gin.H{"baggages": baggages})
+    c.JSON(http.StatusOK, gin.H{"ships": ships.Ships, "requestID":ships.RequestID})
 }
 
-// @Summary Получение багажа по ID
-// @Description Возвращает информацию о багаже по его ID
-// @Tags Багаж
+// @Summary Получение судна по ID
+// @Description Возвращает информацию о суднe по его ID
+// @Tags Судно
 // @Produce json
-// @Param baggage_id path int true "ID багажа"
-// @Success 200 {object} model.Baggage "Информация о багаже"
-// @Failure 400 {object} model.Baggage "Некорректный запрос"
-// @Failure 500 {object} model.Baggage "Внутренняя ошибка сервера"
-// @Router /baggage/{baggage_id} [get]
-func (h *Handler) GetBaggageByID(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
+// @Param shipID path int true "ID судна"
+// @Success 200 {object} model.Ship "Информация о суднe"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Router /ship/{shipID} [get]
+func (h *Handler) GetShipByID(c *gin.Context) {
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
-    baggageID, err := strconv.Atoi(c.Param("baggage_id"))
+    shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД судна"})
         return
     }
 
-    baggage, err := h.UseCase.GetBaggageByID(uint(baggageID),authInstance.UserID)
+    ship, err := h.UseCase.GetShipByID(uint(shipID), userID)
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"baggage": baggage})
+    c.JSON(http.StatusOK, gin.H{"ship": ship})
 }
 
-// @Summary Создание нового багажа
-// @Description Создает новый багаж с предоставленными данными
-// @Tags Багаж
+// @Summary Создание нового судна
+// @Description Создает новое судно с предоставленными данными
+// @Tags Судно
 // @Accept json
 // @Produce json
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.BaggagesGetResponse "Список багажей"
-// @Failure 400 {object} model.BaggagesGetResponse "Некорректный запрос"
-// @Failure 500 {object} model.BaggagesGetResponse "Внутренняя ошибка сервера"
-// @Router /baggage/create [post]
-func (h *Handler) CreateBaggage(c *gin.Context) {
+// @Param shipName query string false "Название судна" Format(email)
+// @Param ship body model.ShipRequest true "Пользовательский объект в формате JSON"
+// @Success 200 {object} model.GetShips "Список судов"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
+// @Failure 403 {object} model.ErrorResponse "У пользователя нет прав для этого запроса"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Security ApiKeyAuth
+// @Router /ship [post]
+func (h *Handler) CreateShip(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    searchCode := c.DefaultQuery("searchCode", "")
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
-	var baggage model.BaggageRequest
+    shipName := c.DefaultQuery("shipName", "")
 
-	if err := c.BindJSON(&baggage); err != nil {
+	var ship model.ShipChange
+
+	if err := c.BindJSON(&ship); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "не удалось прочитать JSON"})
 		return
 	}
 
-	err := h.UseCase.CreateBaggage(authInstance.UserID, baggage)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	baggages, err := h.UseCase.GetBaggages(searchCode,authInstance.UserID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"baggages": baggages})
+    if authInstance.Role == "модератор"{
+        err := h.UseCase.CreateShip(userID, ship)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+    
+        ships, err := h.UseCase.GetShips(shipName, userID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+    
+        c.JSON(http.StatusOK, gin.H{"ships": ships.Ships, "requestID":ships.RequestID})
+    } else {
+        c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только модератору"})
+        return
+    }
 }
 
-// @Summary Удаление багажа
-// @Description Удаляет багаж по его ID
-// @Tags Багаж
+// @Summary Удаление судна
+// @Description Удаляет судно по его ID
+// @Tags Судно
 // @Produce json
-// @Param baggage_id path int true "ID багажа"
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.BaggagesGetResponse "Список багажей"
-// @Failure 400 {object} model.BaggagesGetResponse "Некорректный запрос"
-// @Failure 500 {object} model.BaggagesGetResponse "Внутренняя ошибка сервера"
-// @Router /baggage/{baggage_id}/delete [delete]
-func (h *Handler) DeleteBaggage(c *gin.Context) {
+// @Param shipID path int true "ID судна"
+// @Param shipName query string false "Название судна" Format(email)
+// @Success 200 {object} model.GetShips "Список судов"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
+// @Failure 403 {object} model.ErrorResponse "У пользователя нет прав для этого запроса"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Security ApiKeyAuth
+// @Router /ship/{shipID} [delete]
+func (h *Handler) DeleteShip(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    searchCode := c.DefaultQuery("searchCode", "")
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
+	
+    shipName := c.DefaultQuery("shipName", "")
 
-	baggageID, err := strconv.Atoi(c.Param("baggage_id"))
+	shipID, err := strconv.Atoi(c.Param("shipID"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД судна"})
 		return
 	}
 
-	err = h.UseCase.DeleteBaggage(uint(baggageID), authInstance.UserID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	baggages, err := h.UseCase.GetBaggages(searchCode,authInstance.UserID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"baggages": baggages})
+    if authInstance.Role == "модератор"{
+        err = h.UseCase.DeleteShip(uint(shipID), userID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+    
+        ships, err := h.UseCase.GetShips(shipName, userID)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+    
+        c.JSON(http.StatusOK, gin.H{"ships": ships.Ships, "requestID":ships.RequestID})
+    } else {
+        c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только модератору"})
+        return
+    }
 }
 
-// @Summary Обновление информации о багаже
-// @Description Обновляет информацию о багаже по его ID
-// @Tags Багаж
+// @Summary Обновление информации о суднe
+// @Description Обновляет информацию о суднe по его ID
+// @Tags Судно
 // @Accept json
 // @Produce json
-// @Param baggage_id path int true "ID багажа"
-// @Success 200 {object} model.Baggage "Информация о багаже"
-// @Failure 400 {object} model.Baggage "Некорректный запрос"
-// @Failure 500 {object} model.Baggage "Внутренняя ошибка сервера"
-// @Router /baggage/{baggage_id}/update [put]
-func (h *Handler) UpdateBaggage(c *gin.Context) {
+// @Param shipID path int true "ID судна"
+// @Success 200 {object} model.Ship "Информация о суднe"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
+// @Failure 403 {object} model.ErrorResponse "У пользователя нет прав для этого запроса"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Security ApiKeyAuth
+// @Router /ship/{shipID} [put]
+func (h *Handler) UpdateShip(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
-    baggageID, err := strconv.Atoi(c.Param("baggage_id"))
+    shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"error": "недопустимый ИД багажа"}})
+        c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"error": "недопустимый ИД судна"}})
         return
     }
 
-    var baggage model.BaggageRequest
-    if err := c.BindJSON(&baggage); err != nil {
+    var ship model.ShipChange
+    if err := c.BindJSON(&ship); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "не удалось прочитать JSON"})
         return
     }
+    
+    if authInstance.Role == "модератор"{
+        err = h.UseCase.UpdateShip(uint(shipID),uint(userID), ship)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
 
-    err = h.UseCase.UpdateBaggage(uint(baggageID),authInstance.UserID, baggage)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        updatedShip, err := h.UseCase.GetShipByID(uint(shipID), uint(userID))
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+
+        c.JSON(http.StatusOK, gin.H{"ship": updatedShip})
+    } else {
+        c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос дсотупен только модератору"})
         return
     }
-
-    updatedBaggage, err := h.UseCase.GetBaggageByID(uint(baggageID), authInstance.UserID)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"baggage": updatedBaggage})
 }
 
-// @Summary Добавление багажа к доставке
-// @Description Добавляет багаж к доставке по его ID
-// @Tags Багаж
+// @Summary Добавление судна к доставке
+// @Description Добавляет судно к доставке по его ID
+// @Tags Судно
 // @Produce json
-// @Param baggage_id path int true "ID багажа"
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.BaggagesGetResponse  "Список багажей"
-// @Failure 400 {object} model.BaggagesGetResponse  "Некорректный запрос"
-// @Failure 500 {object} model.BaggagesGetResponse  "Внутренняя ошибка сервера"
-// @Router /baggage/{baggage_id}/delivery [post]
-func (h *Handler) AddBaggageToDelivery(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-    searchCode := c.DefaultQuery("searchCode", "")
+// @Param shipID path int true "ID судна"
+// @Param shipName query string false "Название судна" Format(email)
+// @Success 200 {object} model.GetShips  "Список судов"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Security ApiKeyAuth
+// @Router /ship/{shipID}/request [post]
+func (h *Handler) AddShipToRequest(c *gin.Context) {
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
-    baggageID, err := strconv.Atoi(c.Param("baggage_id"))
+    shipName := c.DefaultQuery("shipName", "")
+
+    shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД судна"})
         return
     }
 
-    err = h.UseCase.AddBaggageToDelivery(uint(baggageID), authInstance.UserID, 1)
+    err = h.UseCase.AddShipToRequest(uint(shipID), uint(userID))
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
-	baggages, err := h.UseCase.GetBaggages(searchCode,authInstance.UserID)
+	ships, err := h.UseCase.GetShips(shipName, uint(userID))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"baggages": baggages})
+    c.JSON(http.StatusOK, gin.H{"ships": ships.Ships, "requestID":ships.RequestID})
 }
 
-// @Summary Удаление багажа из доставки
-// @Description Удаляет багаж из доставки по его ID
-// @Tags Багаж
+// @Summary Удаление судна из доставки
+// @Description Удаляет судно из доставки по его ID
+// @Tags Судно
 // @Produce json
-// @Param baggage_id path int true "ID багажа"
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.BaggagesGetResponse "Список багажей"
-// @Failure 400 {object} model.BaggagesGetResponse "Некорректный запрос"
-// @Failure 500 {object} model.BaggagesGetResponse "Внутренняя ошибка сервера"
-// @Router /baggages/{baggage_id}/delivery [post]
-func (h *Handler) RemoveBaggageFromDelivery(c *gin.Context) {
-    authInstance := auth.GetAuthInstance()
-    searchCode := c.DefaultQuery("searchCode", "")
+// @Param shipID path int true "ID судна"
+// @Param shipName query string false "Название судна" Format(email)
+// @Success 200 {object} model.GetShips "Список судов"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Security ApiKeyAuth
+// @Router /ship/{shipID}/request [delete]
+func (h *Handler) RemoveShipFromRequest(c *gin.Context) {
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
-    baggageID, err := strconv.Atoi(c.Param("baggage_id"))
+    shipName := c.DefaultQuery("shipName", "")
+
+    shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД судна"})
         return
     }
    
-    err = h.UseCase.RemoveBaggageFromDelivery(uint(baggageID), authInstance.UserID)  
+    err = h.UseCase.RemoveShipFromRequest(uint(shipID), uint(userID))  
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
-    baggages, err := h.UseCase.GetBaggages(searchCode, authInstance.UserID)
+    ships, err := h.UseCase.GetShips(shipName, uint(userID))
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{"baggages": baggages})
+    c.JSON(http.StatusOK, gin.H{"ships": ships.Ships, "requestID":ships.RequestID})
 }
 
-// @Summary Добавление изображения к багажу
-// @Description Добавляет изображение к багажу по его ID
-// @Tags Багаж
+// @Summary Добавление изображения к судноу
+// @Description Добавляет изображение к судноу по его ID
+// @Tags Судно
 // @Accept mpfd
 // @Produce json
-// @Param baggage_id path int true "ID багажа"
-// @Param image formData file true "Изображение багажа"
-// @Success 200 {object} model.Baggage "Информация о багаже с изображением"
-// @Success 200 {object} model.Baggage 
-// @Failure 400 {object} model.Baggage "Некорректный запрос"
-// @Failure 500 {object} model.Baggage "Внутренняя ошибка сервера"
-// @Router /baggage/{baggage_id}/image [post]
-func (h* Handler) AddBaggageImage(c* gin.Context) {
+// @Param shipID path int true "ID судна"
+// @Param image formData file true "Изображение судна"
+// @Success 200 {object} model.Ship "Информация о суднe с изображением"
+// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
+// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
+// @Failure 403 {object} model.ErrorResponse "У пользователя нет прав для этого запроса"
+// @Failure 500 {string} string "Внутренняя ошибка сервера"
+// @Security ApiKeyAuth
+// @Router /ship/{shipID}/image [post]
+func (h* Handler) AddShipImage(c* gin.Context) {
     authInstance := auth.GetAuthInstance()
+    ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
-    baggageID, err := strconv.Atoi(c.Param("baggage_id"))
+    shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД судна"})
         return
     }
 
@@ -268,32 +348,37 @@ func (h* Handler) AddBaggageImage(c* gin.Context) {
 
     file, err := image.Open()
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось открыть изображение"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "не удалось открыть изображение"})
         return
     }
     defer file.Close()
 
     imageBytes, err := io.ReadAll(file)
     if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось прочитать изображение в байтах"})
+        c.JSON(http.StatusBadRequest, gin.H{"error": "не удалось прочитать изображение в байтах"})
         return
     }
 
 	contentType := image.Header.Get("Content-Type")
+    
+    if authInstance.Role == "модератор"{
+        err = h.UseCase.AddShipImage(uint(shipID), uint(userID),imageBytes, contentType)
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
 
-    err = h.UseCase.AddBaggageImage(uint(baggageID), authInstance.UserID,imageBytes, contentType)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+        ship, err := h.UseCase.GetShipByID(uint(shipID),uint(userID))
+        if err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+
+        c.JSON(http.StatusOK, gin.H{"ship": ship})
+    } else {
+        c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только модератору"})
         return
     }
-
-    baggage, err := h.UseCase.GetBaggageByID(uint(baggageID),authInstance.UserID)
-    if err != nil {
-        c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-        return
-    }
-
-    c.JSON(http.StatusOK, gin.H{"baggage": baggage})
 }
 
 

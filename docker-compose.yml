@@ -11,17 +11,17 @@ services: # имеджи, которые запустятся по вашему 
       - "5432:5432"
     environment: # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
       POSTGRES_USER: admin
-      POSTGRES_DB: RIP
+      POSTGRES_DB: ShipStation
       POSTGRES_PASSWORD: qwerty
   minio:
-    container_name: minio
+    container_name: S3minio
     image: minio/minio:latest
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ACCESS_KEY: markgregr
-      MINIO_SECRET_KEY: vfhr2310
+      MINIO_ACCESS_KEY: rip
+      MINIO_SECRET_KEY: 1234
       MINIO_CONSOLE_ADDRESS: ":9001"
     volumes:
       - minio-data:/data

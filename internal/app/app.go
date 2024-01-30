@@ -5,7 +5,7 @@ import (
 
 	"github.com/markgregr/RIP/internal/config"
 	"github.com/markgregr/RIP/internal/dsn"
-	"github.com/markgregr/RIP/internal/http/delivery"
+	Request "github.com/markgregr/RIP/internal/http/delivery"
 	"github.com/markgregr/RIP/internal/http/repository"
 	"github.com/markgregr/RIP/internal/http/usecase"
 )
@@ -15,7 +15,7 @@ type Application struct {
     Config    *config.Config
     Repository *repository.Repository
 	UseCase    *usecase.UseCase
-	Handler    *delivery.Handler
+	Handler    *Request.Handler
 }
 
 // New создает новый объект Application и настраивает его.
@@ -32,7 +32,7 @@ func New(ctx context.Context) (*Application, error) {
         return nil, err
     }
     uc := usecase.NewUseCase(repo)
-    h := delivery.NewHandler(uc)
+    h := Request.NewHandler(uc)
     // Инициализируйте и настройте объект Application
     app := &Application{
         Config: cfg,

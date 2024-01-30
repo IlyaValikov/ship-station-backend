@@ -11,12 +11,12 @@ import (
 )
 
 type MinioRepository interface{
-    UploadServiceImage(userID, baggageID uint64, imageBytes []byte, contentType string) (string, error)
-    RemoveServiceImage(userID, baggageID uint64) error
+    UploadServiceImage(userID, shipID uint64, imageBytes []byte, contentType string) (string, error)
+    RemoveServiceImage(userID, shipID uint64) error
 }
 
-func (r *Repository) UploadServiceImage(baggageID, userID uint, imageBytes []byte, contentType string) (string, error) {
-    objectName := fmt.Sprintf("baggages/%d/image", baggageID)
+func (r *Repository) UploadServiceImage(shipID, userID uint, imageBytes []byte, contentType string) (string, error) {
+    objectName := fmt.Sprintf("ships/%d/image", shipID)
 
 	reader := io.NopCloser(bytes.NewReader(imageBytes))
 
@@ -33,15 +33,15 @@ func (r *Repository) UploadServiceImage(baggageID, userID uint, imageBytes []byt
     return imageURL, nil
 }
 
-func (r *Repository) RemoveServiceImage(baggageID, userID uint) error {
-    objectName := fmt.Sprintf("baggages/%d/image", baggageID)
+func (r *Repository) RemoveServiceImage(shipID, userID uint) error {
+    objectName := fmt.Sprintf("ships/%d/image", shipID)
 	err := r.mc.RemoveObject(context.TODO(), "images-bucket", objectName, minio.RemoveObjectOptions{})
 	if err != nil {
 		return errors.New("не удалось удалить изображение из бакет")
 	}
 
-    if err := r.db.Table("baggages").
-	Where("baggage_id = ?", baggageID).
+    if err := r.db.Table("ships").
+	Where("ship_id = ?", shipID).
 	Update("photo", nil).Error; 
 	err != nil {
         return errors.New("ошибка при обновлении URL изображения в базе данных")

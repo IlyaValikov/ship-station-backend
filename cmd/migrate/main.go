@@ -17,7 +17,7 @@ func main() {
     }
 
     // Явно мигрировать только нужные таблицы
-    err = db.AutoMigrate(&model.Baggage{},&model.Delivery{}, &model.User{}, &model.DeliveryBaggage{})
+    err = db.AutoMigrate(&model.Ship{},&model.Request{}, &model.User{}, &model.RequestShip{})
     if err != nil {
         panic("cant migrate db")
     }
