@@ -25,12 +25,7 @@ import (
 // @Router /request [get]
 func (h *Handler) GetRequests(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
     startFormationDate := c.DefaultQuery("startFormationDate", "")
     endFormationDate := c.DefaultQuery("endFormationDate", "")
@@ -57,23 +52,18 @@ func (h *Handler) GetRequests(c *gin.Context) {
 // @Description Возвращает информацию о заявке по её идентификатору
 // @Tags Заявка
 // @Produce json
-// @Param request_id path int true "Идентификатор заявки"
+// @Param requestID path int true "Идентификатор заявки"
 // @Success 200 {object} model.GetRequestByID "Информация о заявке"
 // @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
 // @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Security ApiKeyAuth
-// @Router /request/{request_id} [get]
+// @Router /request/{requestID} [get]
 func (h *Handler) GetRequestByID(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
-    requestID, err := strconv.Atoi(c.Param("request_id"))
+    requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД заявки"})
         return
@@ -99,7 +89,7 @@ func (h *Handler) GetRequestByID(c *gin.Context) {
 // @Description Удаляет заявку по её идентификатору
 // @Tags Заявка
 // @Produce json
-// @Param request_id path int true "Идентификатор заявки"
+// @Param requestID path int true "Идентификатор заявки"
 // @Param searchFlightNumber query string false "Номер рейса" Format(email)
 // @Param startFormationDate query string false "Начало даты формирования" Format(email)
 // @Param endFormationDate query string false "Конец даты формирования" Format(email)
@@ -109,20 +99,15 @@ func (h *Handler) GetRequestByID(c *gin.Context) {
 // @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Security ApiKeyAuth
-// @Router /request/{request_id} [delete]
+// @Router /request/{requestID} [delete]
 func (h *Handler) DeleteRequest(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
     startFormationDate := c.DefaultQuery("startFormationDate", "")
     endFormationDate := c.DefaultQuery("endFormationDate", "")
     requestStatus := c.DefaultQuery("requestStatus", "")
-    requestID, err := strconv.Atoi(c.Param("request_id"))
+    requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД заявки"})
         return
@@ -160,23 +145,18 @@ func (h *Handler) DeleteRequest(c *gin.Context) {
 // @Description Обновляет статус заявки для пользователя по идентификатору заявки
 // @Tags Заявка
 // @Produce json
-// @Param request_id path int true "Идентификатор заявки"
+// @Param requestID path int true "Идентификатор заявки"
 // @Success 200 {object} model.GetRequestByID "Информация о заявке"
 // @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
 // @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Security ApiKeyAuth
-// @Router /request/{request_id}/status/user [put]
+// @Router /request/{requestID}/status/user [put]
 func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
-    requestID, err := strconv.Atoi(c.Param("request_id"))
+    requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "недоупстимый ИД заявки"})
         return
@@ -219,24 +199,19 @@ func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
 // @Description Обновляет статус заявки для модератора по идентификатору заявки
 // @Tags Заявка
 // @Produce json
-// @Param request_id path int true "Идентификатор заявки"
+// @Param requestID path int true "Идентификатор заявки"
 // @Param requestStatus body model.RequestUpdateStatusRequest true "Новый статус заявки"
 // @Success 200 {object} model.GetRequestByID "Информация о заявке"
 // @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
 // @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Security ApiKeyAuth
-// @Router /request/{request_id}/status/moderator [put]
+// @Router /request/{requestID}/status/moderator [put]
 func (h *Handler) UpdateRequestStatusModerator(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
-    requestID, err := strconv.Atoi(c.Param("request_id"))
+    requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД заявки"})
         return

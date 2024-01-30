@@ -10,8 +10,8 @@ var authInstance *AuthManager
 func GetAuthInstance() *AuthManager {
 	if authInstance == nil {
 		authInstance = &AuthManager{
-			UserID: 1,      // Пример значения для пользователя
-			Role:   "user", // Пример роли пользователя
+			UserID: 2,
+			Role:   "модератор",
 		}
 	}
 	return authInstance

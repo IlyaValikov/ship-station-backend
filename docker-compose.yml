@@ -14,14 +14,14 @@ services: # имеджи, которые запустятся по вашему 
       POSTGRES_DB: ShipStation
       POSTGRES_PASSWORD: qwerty
   minio:
-    container_name: S3minio
+    container_name: s3Minio
     image: minio/minio:latest
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
       MINIO_ACCESS_KEY: rip
-      MINIO_SECRET_KEY: 1234
+      MINIO_SECRET_KEY: 12345678
       MINIO_CONSOLE_ADDRESS: ":9001"
     volumes:
       - minio-data:/data

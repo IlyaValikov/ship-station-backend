@@ -7,11 +7,11 @@ import (
 	"github.com/markgregr/RIP/internal/app"
 )
 
-// @title BagTracker RestAPI
+// @title ShipStation RestAPI
 // @version 1.0
-// @description API server for BagTracker application
+// @description API server for ShipStation application
 
-// @host http://localhost:8081
+// @host http://localhost:8080
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth

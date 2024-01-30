@@ -20,12 +20,8 @@ import (
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Router /ship [get]
 func (h *Handler) GetShips(c *gin.Context) {
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+    authInstance := auth.GetAuthInstance()
+	userID := uint(authInstance.UserID)
     shipName := c.DefaultQuery("shipName", "")
 
     ships, err := h.UseCase.GetShips(shipName,userID)
@@ -47,12 +43,8 @@ func (h *Handler) GetShips(c *gin.Context) {
 // @Failure 500 {string} string "Внутренняя ошибка сервера"
 // @Router /ship/{shipID} [get]
 func (h *Handler) GetShipByID(c *gin.Context) {
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+    authInstance := auth.GetAuthInstance()
+	userID := uint(authInstance.UserID)
 
     shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
@@ -85,12 +77,7 @@ func (h *Handler) GetShipByID(c *gin.Context) {
 // @Router /ship [post]
 func (h *Handler) CreateShip(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
     shipName := c.DefaultQuery("shipName", "")
 
@@ -136,12 +123,7 @@ func (h *Handler) CreateShip(c *gin.Context) {
 // @Router /ship/{shipID} [delete]
 func (h *Handler) DeleteShip(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 	
     shipName := c.DefaultQuery("shipName", "")
 
@@ -186,12 +168,7 @@ func (h *Handler) DeleteShip(c *gin.Context) {
 // @Router /ship/{shipID} [put]
 func (h *Handler) UpdateShip(c *gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
     shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {
@@ -238,12 +215,8 @@ func (h *Handler) UpdateShip(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID}/request [post]
 func (h *Handler) AddShipToRequest(c *gin.Context) {
-	ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	authInstance := auth.GetAuthInstance()
+	userID := uint(authInstance.UserID)
 
     shipName := c.DefaultQuery("shipName", "")
 
@@ -281,12 +254,8 @@ func (h *Handler) AddShipToRequest(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /ship/{shipID}/request [delete]
 func (h *Handler) RemoveShipFromRequest(c *gin.Context) {
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+    authInstance := auth.GetAuthInstance()
+	userID := uint(authInstance.UserID)
 
     shipName := c.DefaultQuery("shipName", "")
 
@@ -327,12 +296,7 @@ func (h *Handler) RemoveShipFromRequest(c *gin.Context) {
 // @Router /ship/{shipID}/image [post]
 func (h* Handler) AddShipImage(c* gin.Context) {
     authInstance := auth.GetAuthInstance()
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
+	userID := uint(authInstance.UserID)
 
     shipID, err := strconv.Atoi(c.Param("shipID"))
     if err != nil {

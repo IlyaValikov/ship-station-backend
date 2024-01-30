@@ -11,7 +11,7 @@ func (r *Repository) GetRequestsUser(startFormationDate, endFormationDate, reque
     query := r.db.Table("requests").
         Select("requests.request_id, requests.creation_date, requests.formation_date, requests.completion_date, requests.request_status, users.full_name").
         Joins("JOIN users ON users.user_id = requests.user_id").
-        Where("requests.request_status LIKE ? AND requests.flight_number LIKE ? AND requests.user_id = ? AND requests.request_status != ? AND requests.request_status != ?", requestStatus, userID, model.REQUEST_STATUS_DELETED, model.REQUEST_STATUS_DRAFT)
+        Where("requests.request_status LIKE ? AND requests.user_id = ? AND requests.request_status != ? AND requests.request_status != ?", requestStatus, userID, model.REQUEST_STATUS_DELETED, model.REQUEST_STATUS_DRAFT)
     
     if startFormationDate != "" && endFormationDate != "" {
         query = query.Where("requests.formation_date BETWEEN ? AND ?", startFormationDate, endFormationDate)

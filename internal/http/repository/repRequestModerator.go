@@ -10,10 +10,10 @@ import (
 
 func (r *Repository) GetRequestsModerator(startFormationDate, endFormationDate, requestStatus string) ([]model.GetRequests, error) {
     query := r.db.Table("requests").
-        Select("requests.request_id, requests.creation_date, requests.formation_date, equests.completion_date, requests.request_status, creator.full_name, moderator.full_name as moderator_name").
+        Select("requests.request_id, requests.creation_date, requests.formation_date, requests.completion_date, requests.request_status, creator.full_name, moderator.full_name as moderator_name").
         Joins("JOIN users creator ON creator.user_id = requests.user_id").
         Joins("LEFT JOIN users moderator ON moderator.user_id = requests.moderator_id").
-        Where("requests.request_status LIKE ? AND requests.flight_number LIKE ? AND requests.request_status != ? AND requests.request_status != ?", requestStatus,  model.REQUEST_STATUS_DELETED, model.REQUEST_STATUS_DRAFT)
+        Where("requests.request_status LIKE ? AND requests.request_status != ? AND requests.request_status != ?", requestStatus,  model.REQUEST_STATUS_DELETED, model.REQUEST_STATUS_DRAFT)
     
     if startFormationDate != "" && endFormationDate != "" {
         query = query.Where("requests.formation_date BETWEEN ? AND ?", startFormationDate, endFormationDate)

@@ -28,7 +28,7 @@ type GetRequestByID struct{
 	CompletionDate *time.Time `json:"completion_date"`
 	RequestStatus  string     `json:"request_status"`
 	FullName 	   string 	  `json:"full_name"`
-	Ships          []Ship    ` json:"ships"`
+	Ships          []Ship    `gorm:"many2many:request_ships" json:"ships"`
 }
 
 type StatusRequest struct {
