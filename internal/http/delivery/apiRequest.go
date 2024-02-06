@@ -153,63 +153,80 @@ func (h *Handler) DeleteRequest(c *gin.Context) {
     }
 }
 
-// UpdateRequestStatusUser godoc
-// @Summary Обновление статуса заявки для пользователя
-// @Description Обновляет статус заявки для пользователя по идентификатору заявки
-// @Tags Заявка
-// @Produce json
-// @Param requestID path int true "Идентификатор заявки"
-// @Success 200 {object} model.GetRequestByID "Информация о заявке"
-// @Failure 400 {object} model.ErrorResponse "Обработанная ошибка сервера"
-// @Failure 401 {object} model.ErrorResponse "Пользователь не авторизован"
-// @Failure 500 {string} string "Внутренняя ошибка сервера"
-// @Security ApiKeyAuth
-// @Router /request/{requestID}/status/user [put]
-func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
-    ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
-		return
-	}
-	userID := ctxUserID.(uint)
 
+func (h *Handler) UpdateRequestStatusUser(c *gin.Context) {
     requestID, err := strconv.Atoi(c.Param("requestID"))
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "недоупстимый ИД заявки"})
         return
     }
-
+    token := c.GetHeader("Authorization")
     if middleware.ModeratorOnly(h.UseCase.Repository, c) {
-        err = h.UseCase.UpdateRequestStatusUser(uint(requestID), userID)
+        err = h.UseCase.CheckRequestUser(uint(requestID), token)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
             return
         }
-
-        request, err := h.UseCase.GetRequestByIDModerator(uint(requestID))
-        if err != nil {
-            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-        }
-
-        c.JSON(http.StatusOK, gin.H{"request": request})
-    
     } else {
-        err = h.UseCase.UpdateRequestStatusUser(uint(requestID), userID)
+        err = h.UseCase.CheckRequestUser(uint(requestID), token)
         if err != nil {
             c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
             return
         }
-
-        request, err := h.UseCase.GetRequestByIDUser(uint(requestID), userID)
-        if err != nil {
-            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-        return
-        }
-
-        c.JSON(http.StatusOK, gin.H{"request": request})
     }
 }
+
+func (h *Handler) CheckRequestUser(c *gin.Context) {
+    ctxUserID, exists := c.Get("userID")
+    if !exists {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+        return
+    }
+    userID := ctxUserID.(uint)
+
+    // Парсинг JSON тела запроса
+    var requestBody struct {
+        Key        string `json:"key"`
+        RequestID  uint   `json:"requestID"`
+        PaidStatus string `json:"paidstatus"`
+    }
+    if err := c.ShouldBindJSON(&requestBody); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Проверка ключа
+    if requestBody.Key != "12345" && requestBody.Key == "Запрещено" {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ключ"})
+        return
+    }
+
+    var request model.GetRequestByID
+    var err error
+
+    // Обновление статуса заявки
+    err = h.UseCase.UpdateRequestStatusUser(requestBody.RequestID, userID)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+    // Получение заявки в зависимости от роли пользователя и статуса
+    if middleware.ModeratorOnly(h.UseCase.Repository, c) {
+        request, err = h.UseCase.GetRequestByIDModerator(requestBody.RequestID)
+    } else {
+        request, err = h.UseCase.GetRequestByIDUser(requestBody.RequestID, userID)
+    }
+
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+
+    // Возвращение ответа с заявкой
+    c.JSON(http.StatusOK, gin.H{"request": request})
+}
+
+
 
 // UpdateRequestStatusModerator godoc
 // @Summary Обновление статуса заявки для модератора

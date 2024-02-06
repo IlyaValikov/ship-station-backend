@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"net/http"
 	"time"
 
 	"backend/internal/model"
@@ -90,6 +93,27 @@ func (r *Repository) UpdateRequestStatusUser(requestID, userID uint) error {
 
     return nil
 }
+
+func (r *Repository) CheckRequestUser(requestID uint, token string) error {
+    // Создание структуры для POST-запроса
+    requestData := map[string]interface{}{
+        "requestID": requestID,
+        "token":     token,
+    }
+
+    jsonData, err := json.Marshal(requestData)
+    if err != nil {
+        return errors.New("ошибка кодирования данных запроса в JSON")
+    }
+
+    _, err = http.Post("http://127.0.0.1:8000/check/", "application/json", bytes.NewBuffer(jsonData))
+    if err != nil {
+        return errors.New("ошибка выполнения POST-запроса на асинхронный сервис")
+    }
+
+    return nil
+}
+
 
 
 

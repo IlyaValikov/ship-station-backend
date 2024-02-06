@@ -70,5 +70,13 @@ func (uc *UseCase) UpdateRequestStatusUser(requestID, userID uint) error{
 	return nil
 }
 
+func (uc *UseCase) CheckRequestUser(requestID uint, token string) error{
+	err := uc.Repository.CheckRequestUser(requestID, token)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 

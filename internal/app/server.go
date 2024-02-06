@@ -41,6 +41,7 @@ func (app *Application) Run() {
         RequestGroup.DELETE("/:requestID", app.Handler.DeleteRequest)
         RequestGroup.PUT("/:requestID/status/user", app.Handler.UpdateRequestStatusUser)  
         RequestGroup.PUT("/:requestID/status/moderator", app.Handler.UpdateRequestStatusModerator)  
+        RequestGroup.PUT("/check", app.Handler.CheckRequestUser)  
     }
 
     UserGroup := r.Group("/user")
