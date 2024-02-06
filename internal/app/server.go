@@ -42,7 +42,7 @@ func (app *Application) Run() {
         RequestGroup.PUT("/:requestID/status/user", app.Handler.UpdateRequestStatusUser)  
         RequestGroup.PUT("/:requestID/status/moderator", app.Handler.UpdateRequestStatusModerator)  
     }
-
+    
     UserGroup := r.Group("/user")
     {
         UserGroup.POST("/register", app.Handler.Register)
