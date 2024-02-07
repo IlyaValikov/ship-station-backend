@@ -74,7 +74,7 @@ func (r *Repository) DeleteRequestUser(requestID, userID uint) error {
     return nil
 }
 
-func (r *Repository) UpdateRequestStatusUser(requestID, userID uint) error {
+func (r *Repository) UpdateRequestStatusUser(requestID, userID uint, check bool) error {
     var request model.Request
     if err := r.db.Table("requests").
         Where("requests.request_id = ? AND requests.user_id = ? AND requests.request_status = ?", requestID, userID, model.REQUEST_STATUS_DRAFT).
@@ -82,10 +82,15 @@ func (r *Repository) UpdateRequestStatusUser(requestID, userID uint) error {
         Error; err != nil {
         return errors.New("заявка не найдена, или не принадлежит указанному пользователю, или не имеет статус черновик")
     }
-
-    request.RequestStatus = model.REQUEST_STATUS_WORK
     currentTime := time.Now()
-	request.FormationDate = &currentTime
+    if check{
+        request.RequestStatus = model.REQUEST_STATUS_WORK
+	    request.FormationDate = &currentTime
+    } else {
+        request.RequestStatus = model.REQUEST_STATUS_REJECTED
+	    request.FormationDate = &currentTime
+        request.CompletionDate = &currentTime
+    }
 
     if err := r.db.Save(&request).Error; err != nil {
         return errors.New("ошибка обновления статуса заявки в БД")

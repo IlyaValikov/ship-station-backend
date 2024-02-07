@@ -54,7 +54,7 @@ func (uc *UseCase) DeleteRequestUser(requestID, userID uint) error{
 	return nil
 }
 
-func (uc *UseCase) UpdateRequestStatusUser(requestID, userID uint) error{
+func (uc *UseCase) UpdateRequestStatusUser(requestID, userID uint, check bool) error{
 	if requestID < 0 {
 		return errors.New("недопустимый ИД заявки")
 	}
@@ -62,7 +62,7 @@ func (uc *UseCase) UpdateRequestStatusUser(requestID, userID uint) error{
 		return errors.New("недопустимый ИД пользователя")
 	}
 
-	err := uc.Repository.UpdateRequestStatusUser(requestID, userID)
+	err := uc.Repository.UpdateRequestStatusUser(requestID, userID, check)
 	if err != nil {
 		return err
 	}

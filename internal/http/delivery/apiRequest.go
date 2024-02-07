@@ -194,18 +194,17 @@ func (h *Handler) CheckRequestUser(c *gin.Context) {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
     }
-
-    // Проверка ключа
-    if requestBody.Key != "12345" && requestBody.Key == "Запрещено" {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный ключ"})
-        return
+    var check bool
+    
+    if requestBody.Key != "12345" && requestBody.Key == "Одобрено" {
+        check=true
     }
 
     var request model.GetRequestByID
     var err error
 
     // Обновление статуса заявки
-    err = h.UseCase.UpdateRequestStatusUser(requestBody.RequestID, userID)
+    err = h.UseCase.UpdateRequestStatusUser(requestBody.RequestID, userID, check)
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
         return
