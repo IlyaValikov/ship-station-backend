@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -195,9 +196,9 @@ func (h *Handler) CheckRequestUser(c *gin.Context) {
         return
     }
     var check bool
-    
-    if requestBody.Key != "12345" && requestBody.Key == "Одобрено" {
+    if requestBody.Key == "12345" && requestBody.PaidStatus == "Одобрено" {
         check=true
+        log.Println(12345)
     }
 
     var request model.GetRequestByID
