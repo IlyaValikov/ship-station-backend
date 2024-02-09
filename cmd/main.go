@@ -6,6 +6,7 @@ import (
 	"backend/internal/api"
 )
 
+// start server
 func main() {
 	log.Println("Application start!")
 	api.StartServer()
