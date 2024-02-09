@@ -2,7 +2,8 @@
 
 Ниже перечислены мои репозитории на GitHub:
 
-1. [Фронтенд](https://github.com/markgregr/RIP_FRONTEND/tree/react-moderator-interface) 
-2. [Бэкенд](https://github.com/markgregr/RIP/tree/Auth) 
-3. [Десктопное приложение](-)
-4. [GitHub Pages](https://markgregr.github.io/ship-station-frontend/)
+1. [Фронтенд-приложение](https://github.com/IlyaValikov/ship-station-frontend/tree/react-moderator-interface) 
+2. [Бэкенд-сервер](https://github.com/IlyaValikov/ship-station-backend/tree/Auth) 
+3. [Десктопное приложение](https://github.com/IlyaValikov/ship-station-desktop)
+4. [Асинхронный веб-сервис](https://github.com/IlyaValikov/ship-station-backend/tree/async-service)
+5. [GitHub Pages](https://IlyaValikov.github.io/ship-station-frontend/)
