@@ -7,6 +7,7 @@ import (
 	"backend/internal/app"
 )
 
+// start server
 func main() {
 	log.Println("Application start!")
 	// Создаем контекст
