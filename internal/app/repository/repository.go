@@ -2,6 +2,7 @@ package repository
 
 import (
 	"backend/internal/app/ds"
+	"errors"
 	"strings"
 
 	"gorm.io/driver/postgres"
@@ -32,15 +33,27 @@ func (r *Repository) GetShipByID(shipID uint) (*ds.Ship, error) {
 	return ship, nil
 }
 
-	func (r *Repository) GetShips(shipName string) ([]ds.Ship,error) {
-		shipName = strings.ToLower(shipName+"%")
-		var ships []ds.Ship
-		if err := r.db.Find(&ships, "ship_status = ? AND LOWER(ship_name) LIKE ?", ds.SHIP_STATUS_ACTIVE, shipName).Error; err != nil {
-			return nil, err
-		}
-		return ships, nil
+func (r *Repository) GetShips(shipName string) ([]ds.Ship, error) {
+	shipName = strings.ToLower(shipName + "%")
+	var ships []ds.Ship
+	if err := r.db.Find(&ships, "ship_status = ? AND LOWER(ship_name) LIKE ?", ds.SHIP_STATUS_ACTIVE, shipName).Error; err != nil {
+		return nil, err
 	}
+	return ships, nil
+}
 
 func (r *Repository) DeleteShip(shipID uint) error {
 	return r.db.Exec("UPDATE ships SET ship_status = ? WHERE ship_id = ?", ds.SHIP_STATUS_DELETED, shipID).Error
+}
+
+func (r *Repository) GetShipsFromRequest(requestID int) ([]ds.Ship, error) {
+	var ships []ds.Ship
+	if err := r.db.
+		Table("ships").
+		Joins("JOIN request_ships ON ships.ship_id = request_ships.ship_id").
+		Where("request_ships.request_id = ?", requestID).
+		Scan(&ships).Error; err != nil {
+		return ships, errors.New("ошибка получения судов заявки")
+	}
+	return ships, nil
 }
