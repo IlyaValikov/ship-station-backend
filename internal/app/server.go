@@ -108,7 +108,7 @@ func (app *Application) Run() {
 	})
 	r.GET("/request", func(c *gin.Context) {
 
-		ships, err := app.Repository.GetShipsFromRequest(29)
+		ships, err := app.Repository.GetShipsFromRequest(30)
 		if err != nil {
 			log.Println("Error Repository method GetAll:", err)
 			return
