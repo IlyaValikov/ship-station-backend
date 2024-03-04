@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 func StartServer() {
 	log.Println("Server start up")
 	//Чтение ship.json
@@ -69,6 +68,12 @@ func StartServer() {
 
 		ship := ships[id-1]
 		c.HTML(http.StatusOK, "card.tmpl", ship)
+	})
+	r.GET("/request", func(c *gin.Context) {
+		data := gin.H{
+			"ships": ships[:3],
+		}
+		c.HTML(http.StatusOK, "constructor.tmpl", data)
 	})
 
 	r.Run()
